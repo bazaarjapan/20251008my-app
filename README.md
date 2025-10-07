@@ -31,6 +31,11 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 ## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+このリポジトリは Vercel の Git 連携で自動 CI/CD デプロイできるよう構成しています。`vercel.json` がビルドコマンド (`npm run build`) と出力先 (`.vercel/output`) を定義し、環境変数 `ADMIN_TOKEN` を Vercel シークレット `@admin-token` として参照します。
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. GitHub / GitLab / Bitbucket 上のリポジトリを Vercel の「New Project」からインポートします。
+2. Vercel CLI でシークレットを登録するか、ダッシュボードの「Environment Variables」で `ADMIN_TOKEN` を追加します。CLI 例: `vercel secrets add admin-token <your-secret>`.
+3. Production / Preview / Development すべてに同じシークレットを割り当て、必要なら追加の環境変数も設定します。
+4. main ブランチへ push すると自動でビルド・デプロイが走り、Pull Request の場合はプレビュー URL が発行されます。
+
+詳細は [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) および [Vercel Git Integration](https://vercel.com/docs/deployments/git#git-integration) を参照してください。
