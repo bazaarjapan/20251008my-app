@@ -2,17 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { updateAnnouncement, deleteAnnouncement } from "@/lib/announcements";
 import { requireAdmin } from "@/lib/admin-auth";
 
-type RouteContext = { params: Record<string, string | string[]> };
-
-function extractId(context: RouteContext): string {
-  const raw = context.params?.id;
-  if (Array.isArray(raw)) {
-    return raw[0] ?? "";
-  }
-  return raw ?? "";
-}
-
-export async function PATCH(request: NextRequest, context: RouteContext) {
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
   const auth = requireAdmin(request);
   if (!auth.authorized) {
     return auth.response;
@@ -100,15 +93,16 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     );
   }
 
-  const id = extractId(context);
-  if (id.length === 0) {
-    return NextResponse.json(
-      { error: "Route parameter id is required" },
-      { status: 400 },
-    );
-  }
-
   try {
+    const { id } = await params;
+    const normalizedId = Array.isArray(id) ? id[0] ?? "" : id ?? "";
+    if (normalizedId.length === 0) {
+      return NextResponse.json(
+        { error: "Route parameter id is required" },
+        { status: 400 },
+      );
+    }
+
     const updated = await updateAnnouncement(id, {
       title: title as string | undefined,
       body: body as string | undefined,
@@ -125,22 +119,26 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
   }
 }
 
-export async function DELETE(request: NextRequest, context: RouteContext) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
   const auth = requireAdmin(request);
   if (!auth.authorized) {
     return auth.response;
   }
 
-  const id = extractId(context);
-  if (id.length === 0) {
-    return NextResponse.json(
-      { error: "Route parameter id is required" },
-      { status: 400 },
-    );
-  }
-
   try {
-    await deleteAnnouncement(id);
+    const { id } = await params;
+    const normalizedId = Array.isArray(id) ? id[0] ?? "" : id ?? "";
+    if (normalizedId.length === 0) {
+      return NextResponse.json(
+        { error: "Route parameter id is required" },
+        { status: 400 },
+      );
+    }
+
+    await deleteAnnouncement(normalizedId);
     return NextResponse.json({ ok: true });
   } catch (error) {
     if (error instanceof Error && error.message === "Announcement not found") {
