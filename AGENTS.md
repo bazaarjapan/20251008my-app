@@ -1,23 +1,36 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-The App Router lives in `app/`. Key routes: `app/page.tsx` (public board), `app/announcements/page.tsx` (archive), and `app/admin/announcements/page.tsx` (admin console). API routes reside under `app/api/`, with `/api/announcements` for public reads and `/api/admin/announcements` for authenticated posts. Shared utilities sit in `lib/`, and persisted data is stored as JSON within `data/announcements.json`. Keep static assets in `public/`, configuration at the root (`next.config.ts`, `tsconfig.json`, `eslint.config.mjs`), and never edit generated directories like `.next/` or `node_modules/`.
+- `app/` — Next.js App Router. Key routes: `page.tsx` (public board), `announcements/page.tsx` (archive), `admin/announcements/page.tsx` (admin console). API handlers live under `app/api/**`.
+- `lib/` — Shared utilities, including announcement persistence (`lib/announcements.ts`) and admin token checks (`lib/admin-auth.ts`).
+- `data/` — Local JSON fallback storage (`announcements.json`) used when Vercel KV is unavailable; treat it as dev-only.
+- `assets/` — Reference images for docs. Do not bundle them at runtime.
+- Config roots: `package.json`, `vercel.json`, `tsconfig.json`, `eslint.config.mjs`.
 
 ## Build, Test, and Development Commands
-- `npm install` — install dependencies; stick with npm to honour `package-lock.json`.
-- `npm run dev` — launch the Turbopack dev server on http://localhost:3000 with hot refresh.
-- `npm run build` — compile the production bundle; run before release or deployment.
-- `npm run start` — serve the production build locally for smoke checks.
-- `npm run lint` — run ESLint with the Next.js + TypeScript ruleset. Fix issues before committing.
+- `npm install` — Resolve dependencies; prefer npm to keep `package-lock.json` authoritative.
+- `npm run dev` — Start the local dev server at http://localhost:3000.
+- `npm run build` — Production build; used by Vercel.
+- `npm run start` — Serve the production bundle locally for smoke tests.
+- `npm run lint` — ESLint with Next.js/TypeScript rules.
 
 ## Coding Style & Naming Conventions
-Use TypeScript with strict settings. Components, pages, and layouts follow PascalCase (`AdminAnnouncementsPage.tsx`); hooks and helpers use camelCase (`getAnnouncements`). Prefer module-relative imports (`@/lib/announcements`). Indent with two spaces, keep JSX concise (<100 characters per line), and group imports by package → internal → styles. Run `npm run lint` after changes instead of hand-tuning formatting.
+- TypeScript + JSX with strict settings; 2-space indentation.
+- Components/pages: PascalCase (`AdminAnnouncementsPage`), hooks/utilities: camelCase (`getAnnouncements`).
+- Keep lines ≤ 100 chars where reasonable; prefer module-relative imports (`@/lib/...`).
+- Let ESLint and TypeScript drive formatting fixes—avoid manual stylistic churn.
 
 ## Testing Guidelines
-A formal test runner is not configured. When adding new features, introduce automated coverage alongside the code (e.g., create `app/<feature>/__tests__/Component.test.tsx`) and wire an `npm run test` script if you adopt Vitest, Jest, or Playwright. Until a harness exists, document manual verification steps (screenshots, commands) in your PR and ensure `npm run start` passes smoke tests.
+- No automated test runner is wired yet. When adding tooling (e.g., Vitest, Playwright), colocate specs under `__tests__/` with `.test.tsx` suffix and expose an `npm run test` script.
+- Until then, document manual verification (commands run, UI captures) in PRs and exercise `npm run lint` plus `npm run build`.
 
 ## Commit & Pull Request Guidelines
-Follow short, imperative commit subjects (`Add admin notice form`), ≤72 characters, optional body for context, and reference issues (`Closes #123`). Keep branches rebased on `main`. PRs must outline scope, note schema or env changes, attach UI evidence (e.g., admin form screenshot), and list executed commands. Request at least one review before merging.
+- Follow imperative summaries ≤72 chars (`Add KV storage fallback`). Expand context in the body if needed.
+- Ensure the branch is rebased on `main` before opening a PR.
+- PRs should include: scope summary, linked issues (`Closes #123`), screenshots or clips for UI changes, test evidence, and migration/env notes.
+- Request review once checks pass; respond to feedback promptly and keep conversation threads resolved.
 
-## Security & Configuration Tips
-Set `ADMIN_TOKEN=<secret>` in an `.env.local` file; the admin API rejects posts without it. Never commit the token or `data/announcements.json` with sensitive entries—scrub before sharing. Back up `data/announcements.json` prior to bulk edits, and prefer scripted migrations over manual JSON edits when transforming stored announcements.
+## Deployment & Security Notes
+- Vercel deploys require `ADMIN_TOKEN` plus Vercel KV credentials (`KV_REST_API_URL`, `KV_REST_API_TOKEN`, `KV_REST_API_READ_ONLY_TOKEN`). Configure them per environment; never commit secrets.
+- In local dev, `.env.local` should define `ADMIN_TOKEN`. For Vercel, set vars via dashboard.
+- Treat `data/announcements.json` as non-sensitive and remove before publishing public datasets.
