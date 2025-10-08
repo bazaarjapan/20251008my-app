@@ -60,3 +60,52 @@ export async function addAnnouncement(
   await fs.writeFile(dataFile, JSON.stringify(announcements, null, 2), "utf-8");
   return entry;
 }
+
+type UpdateAnnouncement = {
+  title?: string;
+  body?: string;
+  publishedAt?: string;
+  highlight?: boolean;
+};
+
+export async function updateAnnouncement(
+  id: string,
+  updates: UpdateAnnouncement,
+): Promise<Announcement> {
+  await ensureDataFile();
+  const announcements = await getAnnouncements();
+  const index = announcements.findIndex((item) => item.id === id);
+
+  if (index === -1) {
+    throw new Error("Announcement not found");
+  }
+
+  const original = announcements[index];
+  const next: Announcement = {
+    ...original,
+    title:
+      updates.title !== undefined ? updates.title.trim() : original.title,
+    body: updates.body !== undefined ? updates.body.trim() : original.body,
+    highlight:
+      updates.highlight !== undefined ? updates.highlight : original.highlight,
+    publishedAt:
+      updates.publishedAt !== undefined
+        ? new Date(updates.publishedAt).toISOString()
+        : original.publishedAt,
+  };
+
+  announcements[index] = next;
+  await fs.writeFile(dataFile, JSON.stringify(announcements, null, 2), "utf-8");
+  return next;
+}
+
+export async function deleteAnnouncement(id: string): Promise<void> {
+  await ensureDataFile();
+  const announcements = await getAnnouncements();
+  const next = announcements.filter((item) => item.id !== id);
+  if (next.length === announcements.length) {
+    throw new Error("Announcement not found");
+  }
+
+  await fs.writeFile(dataFile, JSON.stringify(next, null, 2), "utf-8");
+}

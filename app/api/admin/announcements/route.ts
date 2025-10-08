@@ -1,28 +1,11 @@
 import { NextResponse } from "next/server";
 import { addAnnouncement } from "@/lib/announcements";
-
-const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
-
-function unauthorized() {
-  return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-}
+import { requireAdmin } from "@/lib/admin-auth";
 
 export async function POST(request: Request) {
-  if (!ADMIN_TOKEN) {
-    return NextResponse.json(
-      { error: "Server misconfiguration: missing ADMIN_TOKEN" },
-      { status: 500 },
-    );
-  }
-
-  const authHeader = request.headers.get("authorization");
-  if (!authHeader?.startsWith("Bearer ")) {
-    return unauthorized();
-  }
-
-  const token = authHeader.slice("Bearer ".length).trim();
-  if (token !== ADMIN_TOKEN) {
-    return unauthorized();
+  const auth = requireAdmin(request);
+  if (!auth.authorized) {
+    return auth.response;
   }
 
   let payload: unknown;
