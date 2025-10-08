@@ -1,41 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 20251008my-app
 
-## Getting Started
+最新情報掲示板を提供する Next.js プロジェクトです。管理者が投稿すると、トップページに最新のお知らせが表示され、一般ユーザーはアーカイブも確認できます。
 
-First, run the development server:
+## 必要なもの
+- GitHub アカウント
+- Node.js 18 以上と npm（`node -v`, `npm -v` で確認）
+- Git（ローカルで編集・コミットする場合）
+- Vercel アカウント（本番公開用）
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## テンプレートから自分のリポジトリを作成する
+1. ブラウザで [bazaarjapan/20251008my-app](https://github.com/bazaarjapan/20251008my-app) を開きます。
+2. 画面右上付近の **Use this template** ボタンをクリックします。  
+   ![Use this template ボタン](assets/image01.png)
+3. 表示されたフォームで以下を設定します。
+   - **Owner**: 自分のアカウントまたは所属組織
+   - **Repository name**: 任意の名前（例: `my-company-announcements`）
+   - 必要に応じて説明文を追加
+4. **Create repository from template** を押すと、自分名義のリポジトリが作成されます。
+5. ローカルで作業する場合は作成したリポジトリをクローンします。
+   ```bash
+   git clone https://github.com/<your-account>/<your-repo>.git
+   cd <your-repo>
+   ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ローカル環境のセットアップ
+1. 依存関係をインストールします。
+   ```bash
+   npm install
+   ```
+2. 管理者トークンを設定するため、プロジェクト直下に `.env.local` を作り次の内容を追加します。
+   ```env
+   ADMIN_TOKEN=your-secret-token
+   ```
+   > この値は管理者ページで投稿する際に入力するパスワードです。推測されにくい文字列を使ってください。
+3. 開発サーバーを起動し、ブラウザで http://localhost:3000 を開きます。
+   ```bash
+   npm run dev
+   ```
+4. 投稿テスト  
+   - 管理者ページ: http://localhost:3000/admin/announcements  
+   - トークン欄に `.env.local` の `ADMIN_TOKEN` を入力し、お知らせを投稿  
+   - トップページと http://localhost:3000/announcements を確認し、表示されるかチェックします。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## プロジェクト構成の概要
+- `app/` — App Router ルート。`page.tsx` がトップページ、`announcements/page.tsx` がアーカイブ、`admin/announcements/page.tsx` が管理画面です。
+- `app/api/announcements` — 一般公開用 GET API。
+- `app/api/admin/announcements` — Bearer トークン必須の POST API。
+- `lib/announcements.ts` — JSON ファイルを読み書きするヘルパー。
+- `data/announcements.json` — お知らせの保存先。バックアップをおすすめします。
+- `vercel.json` — Vercel 用ビルド設定と環境変数のマッピング。
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Vercel での自動 CI/CD デプロイ手順
+1. **GitHub を連携**  
+   Vercel ダッシュボードで「New Project」→「Import Git Repository」を選択し、先ほど作成したリポジトリを選びます。
+2. **環境変数を設定**  
+   - Vercel CLI を使う場合: `vercel secrets add admin-token your-secret-token`  
+   - ダッシュボードを使う場合: Project Settings → Environment Variables で `ADMIN_TOKEN` を追加し、値に秘密のトークンを設定します。  
+   `vercel.json` では `ADMIN_TOKEN` が `@admin-token` というシークレットを参照します。CLI を使う場合はシークレット名を `admin-token` にしてください。
+3. **ビルド設定の確認**  
+   `vercel.json` により `npm install` → `npm run build` → `.vercel/output` という設定が自動で反映されます。変更が必要なければそのまま保存します。
+4. **初回デプロイ**  
+   「Deploy」ボタンを押すと、Vercel がビルドを実行し本番 URL を発行します。エラーが出た場合はログを確認し、環境変数の設定漏れなどをチェックしてください。
+5. **以後の運用**  
+   GitHub の `main` ブランチへ push するたびに自動でビルド・デプロイ（CI/CD）が走ります。Pull Request を作成するとプレビュー用 URL も生成されるので、レビュー時の確認に利用できます。
 
-## Learn More
+## トラブルシューティング
+- **管理者ページで 401 Unauthorized**  
+  → `ADMIN_TOKEN` の値と入力が一致しているか、Vercel では環境変数が本番／プレビュー両方に設定されているか確認してください。
+- **ビルドが失敗する**  
+  → Node.js バージョンが 18 以上か、`npm run lint` によるエラーがないかをローカルで確認してください。
+- **掲示内容をリセットしたい**  
+  → `data/announcements.json` を空の配列 `[]` に書き換え、アプリを再起動します。重要データは事前にバックアップしてください。
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-このリポジトリは Vercel の Git 連携で自動 CI/CD デプロイできるよう構成しています。`vercel.json` がビルドコマンド (`npm run build`) と出力先 (`.vercel/output`) を定義し、環境変数 `ADMIN_TOKEN` を Vercel シークレット `@admin-token` として参照します。
-
-1. GitHub / GitLab / Bitbucket 上のリポジトリを Vercel の「New Project」からインポートします。
-2. Vercel CLI でシークレットを登録するか、ダッシュボードの「Environment Variables」で `ADMIN_TOKEN` を追加します。CLI 例: `vercel secrets add admin-token <your-secret>`.
-3. Production / Preview / Development すべてに同じシークレットを割り当て、必要なら追加の環境変数も設定します。
-4. main ブランチへ push すると自動でビルド・デプロイが走り、Pull Request の場合はプレビュー URL が発行されます。
-
-詳細は [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) および [Vercel Git Integration](https://vercel.com/docs/deployments/git#git-integration) を参照してください。
+困った時は Issue を作成するか、リポジトリ管理者までお気軽に連絡してください。
