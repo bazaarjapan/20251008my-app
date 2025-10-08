@@ -233,43 +233,43 @@ export default function AdminAnnouncementsPage() {
   const loadingLabel = isEditing ? "更新中..." : "投稿中...";
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
-      <header className="border-b border-slate-800 bg-slate-900/70 backdrop-blur">
-        <div className="mx-auto flex max-w-4xl flex-col gap-3 px-6 py-8">
-          <h1 className="text-2xl font-semibold text-white sm:text-3xl">
-            管理者用お知らせ投稿
-          </h1>
-          <p className="text-sm text-slate-300 sm:text-base">
-            環境変数{" "}
-            <code className="rounded bg-slate-800 px-2 py-1 text-xs">
-              ADMIN_TOKEN
-            </code>{" "}
-            を設定済みの管理者のみが投稿・編集・削除できます。
-          </p>
+    <div className="bg-white text-slate-900">
+      <main className="mx-auto flex max-w-3xl flex-col gap-8 px-4 py-8 sm:py-10">
+        <div className="flex items-start justify-between">
+          <div className="flex flex-col gap-2">
+            <h1 className="text-xl font-semibold text-slate-900 sm:text-2xl">
+              管理者コンソール
+            </h1>
+            <p className="text-sm text-slate-600">
+              環境変数{" "}
+              <code className="rounded bg-slate-100 px-2 py-1 text-xs text-slate-700">
+                ADMIN_TOKEN
+              </code>{" "}
+              を設定した管理者のみが投稿を追加・編集・削除できます。
+            </p>
+          </div>
           <Link
             href="/"
-            className="text-sm font-medium text-sky-300 hover:text-sky-200"
+            className="text-xs font-medium text-slate-400 transition hover:text-slate-600"
           >
-            ホームに戻る →
+            公開ページへ戻る
           </Link>
         </div>
-      </header>
 
-      <main className="mx-auto flex max-w-4xl flex-col gap-10 px-6 py-10">
-        <section className="rounded-xl border border-slate-800 bg-slate-900/60 p-6 shadow-lg shadow-slate-950/30">
+        <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
           {isEditing && (
-            <div className="mb-4 rounded-md border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+            <div className="mb-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
               編集モード: 変更後に「{submitLabel}」を押してください。
             </div>
           )}
           <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
             <fieldset className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-slate-200">
+              <label className="text-sm font-medium text-slate-700">
                 管理者トークン
               </label>
               <input
                 type="password"
-                className="rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-500/50"
+                className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
                 placeholder="環境変数 ADMIN_TOKEN の値を入力"
                 value={token}
                 onChange={(event) => setToken(event.target.value)}
@@ -277,12 +277,12 @@ export default function AdminAnnouncementsPage() {
             </fieldset>
 
             <fieldset className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-slate-200">
+              <label className="text-sm font-medium text-slate-700">
                 タイトル
               </label>
               <input
                 type="text"
-                className="rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-500/50"
+                className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
                 placeholder="例: 10月のメンテナンス予定"
                 value={title}
                 onChange={(event) => setTitle(event.target.value)}
@@ -290,11 +290,11 @@ export default function AdminAnnouncementsPage() {
             </fieldset>
 
             <fieldset className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-slate-200">
+              <label className="text-sm font-medium text-slate-700">
                 本文
               </label>
               <textarea
-                className="min-h-[140px] rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-500/50"
+                className="min-h-[140px] rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
                 placeholder="詳細を記載してください。改行も可能です。"
                 value={body}
                 onChange={(event) => setBody(event.target.value)}
@@ -302,21 +302,21 @@ export default function AdminAnnouncementsPage() {
             </fieldset>
 
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <label className="flex items-center gap-2 text-sm text-slate-200">
+              <label className="flex items-center gap-2 text-sm text-slate-700">
                 <input
                   type="checkbox"
-                  className="h-4 w-4 rounded border border-slate-700 bg-slate-900 text-sky-500 focus:ring-sky-500"
+                  className="h-4 w-4 rounded border border-slate-400 bg-white text-sky-600 focus:ring-sky-500"
                   checked={highlight}
                   onChange={(event) => setHighlight(event.target.checked)}
                 />
                 注目マークを付ける
               </label>
 
-              <div className="flex flex-col gap-2 text-sm text-slate-200">
+              <div className="flex flex-col gap-2 text-sm text-slate-700">
                 <span>公開日時（任意）</span>
                 <input
                   type="datetime-local"
-                  className="rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-500/50"
+                  className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
                   value={publishedAt}
                   onChange={(event) => setPublishedAt(event.target.value)}
                 />
@@ -327,7 +327,7 @@ export default function AdminAnnouncementsPage() {
               <button
                 type="submit"
                 disabled={isFormDisabled}
-                className="inline-flex items-center justify-center rounded-md bg-sky-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sky-400 disabled:cursor-not-allowed disabled:bg-slate-600"
+                className="inline-flex items-center justify-center rounded-md bg-sky-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sky-400 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500"
               >
                 {status.kind === "loading" ? loadingLabel : submitLabel}
               </button>
@@ -335,7 +335,7 @@ export default function AdminAnnouncementsPage() {
               {isEditing && (
                 <button
                   type="button"
-                  className="rounded-md border border-slate-600 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-slate-400 hover:text-white"
+                  className="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-slate-400 hover:text-slate-900"
                   onClick={handleCancelEdit}
                 >
                   編集をキャンセル
@@ -344,12 +344,12 @@ export default function AdminAnnouncementsPage() {
             </div>
 
             {status.kind === "error" && (
-              <p className="text-sm font-medium text-rose-400">
+              <p className="text-sm font-medium text-rose-500">
                 {status.message}
               </p>
             )}
             {status.kind === "success" && (
-              <p className="text-sm font-medium text-emerald-400">
+              <p className="text-sm font-medium text-emerald-600">
                 {status.message}
               </p>
             )}
@@ -357,9 +357,11 @@ export default function AdminAnnouncementsPage() {
         </section>
 
         <section className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold text-white">投稿済み一覧</h2>
+          <h2 className="text-lg font-semibold text-slate-900">
+            投稿済み一覧
+          </h2>
           {announcements.length === 0 ? (
-            <p className="rounded-md border border-dashed border-slate-700 bg-slate-900/40 px-4 py-6 text-center text-sm text-slate-300">
+            <p className="rounded-md border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">
               まだ投稿はありません。
             </p>
           ) : (
@@ -369,19 +371,19 @@ export default function AdminAnnouncementsPage() {
                 return (
                   <li
                     key={announcement.id}
-                    className={`rounded-lg border bg-slate-900/60 p-4 transition ${
+                    className={`rounded-lg border bg-white p-4 shadow-sm transition ${
                       isCurrentEditing
-                        ? "border-sky-500/60 shadow-lg shadow-sky-900/40"
-                        : "border-slate-800"
+                        ? "border-sky-400 shadow-sky-100"
+                        : "border-slate-200"
                     }`}
                   >
                     <div className="flex flex-col gap-2">
                       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                         <div className="flex flex-col gap-1">
-                          <h3 className="text-base font-semibold text-slate-100 sm:text-lg">
+                          <h3 className="text-base font-semibold text-slate-900 sm:text-lg">
                             {announcement.title}
                           </h3>
-                          <time className="text-xs uppercase tracking-wide text-slate-400">
+                          <time className="text-xs text-slate-500">
                             {dateFormatter.format(
                               new Date(announcement.publishedAt),
                             )}
@@ -391,14 +393,14 @@ export default function AdminAnnouncementsPage() {
                         <div className="flex gap-2">
                           <button
                             type="button"
-                            className="rounded-md border border-slate-600 px-3 py-1 text-xs font-medium text-slate-200 transition hover:border-slate-400 hover:text-white"
+                            className="rounded-md border border-slate-300 px-3 py-1 text-xs font-medium text-slate-600 transition hover:border-slate-400 hover:text-slate-900"
                             onClick={() => handleEditSelect(announcement)}
                           >
                             編集
                           </button>
                           <button
                             type="button"
-                            className="rounded-md border border-rose-500/60 px-3 py-1 text-xs font-medium text-rose-300 transition hover:border-rose-400 hover:text-rose-200"
+                            className="rounded-md border border-rose-200 px-3 py-1 text-xs font-medium text-rose-600 transition hover:border-rose-300 hover:text-rose-700"
                             onClick={() => void handleDelete(announcement.id)}
                           >
                             削除
@@ -406,11 +408,11 @@ export default function AdminAnnouncementsPage() {
                         </div>
                       </div>
                       {announcement.highlight && (
-                        <span className="w-fit rounded-full bg-amber-500/20 px-3 py-1 text-xs font-medium text-amber-200">
+                        <span className="w-fit rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-700">
                           注目
                         </span>
                       )}
-                      <p className="whitespace-pre-line text-sm leading-6 text-slate-200">
+                      <p className="whitespace-pre-line text-sm leading-6 text-slate-700">
                         {announcement.body}
                       </p>
                     </div>
