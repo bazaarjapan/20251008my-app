@@ -63,9 +63,8 @@
 1. **GitHub を連携**  
    Vercel ダッシュボードで「New Project」→「Import Git Repository」を選択し、先ほど作成したリポジトリを選びます。
 2. **環境変数を設定**  
-   - Vercel CLI を使う場合: `vercel secrets add admin-token your-secret-token`  
-   - ダッシュボードを使う場合: Project Settings → Environment Variables で `ADMIN_TOKEN` を追加し、値に秘密のトークンを設定します。  
-   `vercel.json` では `ADMIN_TOKEN` が `@admin-token` というシークレットを参照します。CLI を使う場合はシークレット名を `admin-token` にしてください。
+   - Project Settings → Environment Variables で `ADMIN_TOKEN` を追加し、秘密のトークンを設定します。  
+   - 併せて Vercel KV（無料枠あり）をプロジェクトに連携し、`KV_REST_API_URL` / `KV_REST_API_TOKEN` / `KV_REST_API_READ_ONLY_TOKEN` を登録してください。これらが未設定の場合、本番環境ではデータが保持されません。
 3. **ビルド設定の確認**  
    `vercel.json` により `npm install` → `npm run build` → `.vercel/output` という設定が自動で反映されます。変更が必要なければそのまま保存します。
 4. **初回デプロイ**  
