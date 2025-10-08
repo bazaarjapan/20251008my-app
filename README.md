@@ -53,6 +53,8 @@
    - トークン欄に `.env.local` の `ADMIN_TOKEN` を入力し、お知らせを投稿  
    - トップページと http://localhost:3000/announcements を確認し、表示されるかチェックします。
 
+![管理者コンソールの投稿フォーム](assets/image04.png)
+
 ## プロジェクト構成の概要
 - `app/` — App Router ルート。`page.tsx` がトップページ、`announcements/page.tsx` がアーカイブ、`admin/announcements/page.tsx` が管理画面です。
 - `app/api/announcements` — 一般公開用 GET API。
