@@ -32,6 +32,8 @@
 4. `.env.local` は Codespaces 上で作成可能です。エクスプローラーで「New File」→ `.env.local` を作成し、`ADMIN_TOKEN=your-secret-token` を追加します。
 5. 変更ができたら Git タブからコミットし、`main` へ push するか Pull Request を作成してください。
 
+![GitHub Codespaces での編集画面](assets/image02.png)
+
 ## ローカル環境のセットアップ
 1. 依存関係をインストールします。
    ```bash
@@ -72,6 +74,8 @@
    「Deploy」ボタンを押すと、Vercel がビルドを実行し本番 URL を発行します。エラーが出た場合はログを確認し、環境変数の設定漏れなどをチェックしてください。
 5. **以後の運用**  
    GitHub の `main` ブランチへ push するたびに自動でビルド・デプロイ（CI/CD）が走ります。Pull Request を作成するとプレビュー用 URL も生成されるので、レビュー時の確認に利用できます。
+
+![Vercel デプロイ設定画面](assets/image03.png)
 
 ## トラブルシューティング
 - **管理者ページで 401 Unauthorized**  
