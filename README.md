@@ -57,7 +57,7 @@
 - `app/api/admin/announcements` — Bearer トークン必須の POST API。
 - `lib/announcements.ts` — JSON ファイルを読み書きするヘルパー。
 - `data/announcements.json` — お知らせの保存先。バックアップをおすすめします。
-- `vercel.json` — Vercel 用ビルド設定と環境変数のマッピング。
+- `vercel.json` — Vercel で Next.js プロジェクトとして扱うための簡易設定。
 
 ## Vercel での自動 CI/CD デプロイ手順
 1. **GitHub を連携**  
@@ -66,7 +66,7 @@
    - Project Settings → Environment Variables で `ADMIN_TOKEN` を追加し、秘密のトークンを設定します。  
    - 併せて Vercel KV（無料枠あり）をプロジェクトに連携し、`KV_REST_API_URL` / `KV_REST_API_TOKEN` / `KV_REST_API_READ_ONLY_TOKEN` を登録してください。これらが未設定の場合、本番環境ではデータが保持されません。
 3. **ビルド設定の確認**  
-   `vercel.json` により `npm install` → `npm run build` → `.vercel/output` という設定が自動で反映されます。変更が必要なければそのまま保存します。
+   Framework Preset が `Next.js` になっていれば、Vercel が自動で `npm install` → `npm run build` を実行します（`vercel.json` はフレームワーク指定のみ）。
 4. **初回デプロイ**  
    「Deploy」ボタンを押すと、Vercel がビルドを実行し本番 URL を発行します。エラーが出た場合はログを確認し、環境変数の設定漏れなどをチェックしてください。
 5. **以後の運用**  
