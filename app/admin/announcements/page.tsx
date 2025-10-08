@@ -365,13 +365,21 @@ export default function AdminAnnouncementsPage() {
                 投稿の追加・編集・削除はすべて認証済みのトークンで行われます。
               </p>
             </div>
-            <button
-              type="button"
-              onClick={handleSignOut}
-              className="text-xs font-medium text-slate-400 underline-offset-4 transition hover:text-slate-600 hover:underline"
-            >
-              認証をやり直す
-            </button>
+            <div className="flex flex-col items-end gap-2 text-xs sm:flex-row sm:items-center sm:gap-3">
+              <Link
+                href="/"
+                className="font-medium text-slate-400 underline-offset-4 transition hover:text-slate-600 hover:underline"
+              >
+                公開ページへ戻る
+              </Link>
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className="font-medium text-slate-400 underline-offset-4 transition hover:text-slate-600 hover:underline"
+              >
+                認証をやり直す
+              </button>
+            </div>
           </div>
           {authStatus.kind === "success" && (
             <p className="text-xs font-medium text-emerald-600">
