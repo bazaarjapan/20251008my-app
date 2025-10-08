@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 
 type Announcement = {
@@ -47,23 +47,27 @@ export default function AdminAnnouncementsPage() {
   const [token, setToken] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [status, setStatus] = useState<Status>({ kind: "idle" });
+  const [authStatus, setAuthStatus] = useState<Status>({ kind: "idle" });
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
   const isEditing = editingId !== null;
+  const trimmedToken = token.trim();
 
   const isFormDisabled = useMemo(
     () =>
       status.kind === "loading" ||
+      !isAuthorized ||
       title.trim().length === 0 ||
       body.trim().length === 0 ||
-      token.trim().length === 0,
-    [status.kind, title, body, token],
+      trimmedToken.length === 0,
+    [status.kind, isAuthorized, title, body, trimmedToken],
   );
 
-  useEffect(() => {
-    void refreshAnnouncements();
-  }, []);
+  const refreshAnnouncements = useCallback(async () => {
+    if (!isAuthorized) {
+      return;
+    }
 
-  async function refreshAnnouncements() {
     try {
       const res = await fetch("/api/announcements", { cache: "no-store" });
       if (!res.ok) {
@@ -78,7 +82,13 @@ export default function AdminAnnouncementsPage() {
         message: "お知らせ一覧の取得に失敗しました。",
       });
     }
-  }
+  }, [isAuthorized]);
+
+  useEffect(() => {
+    if (isAuthorized) {
+      void refreshAnnouncements();
+    }
+  }, [isAuthorized, refreshAnnouncements]);
 
   function resetForm() {
     setTitle("");
@@ -88,13 +98,66 @@ export default function AdminAnnouncementsPage() {
     setEditingId(null);
   }
 
+  async function handleAuthorize(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (trimmedToken.length === 0) {
+      setAuthStatus({
+        kind: "error",
+        message: "管理者トークンを入力してください。",
+      });
+      return;
+    }
+
+    setAuthStatus({ kind: "loading" });
+
+    try {
+      const res = await fetch("/api/admin/validate", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${trimmedToken}`,
+        },
+      });
+
+      if (!res.ok) {
+        const detail = (await res.json().catch(() => null)) as
+          | { error?: string }
+          | null;
+        throw new Error(
+          detail?.error ?? `認証に失敗しました (${res.status})`,
+        );
+      }
+
+      setIsAuthorized(true);
+      setAuthStatus({ kind: "success", message: "認証に成功しました。" });
+      setStatus({ kind: "idle" });
+    } catch (error) {
+      console.error(error);
+      setIsAuthorized(false);
+      setAuthStatus({
+        kind: "error",
+        message:
+          error instanceof Error ? error.message : "認証に失敗しました。",
+      });
+    }
+  }
+
+  function handleSignOut() {
+    setIsAuthorized(false);
+    setAnnouncements([]);
+    resetForm();
+    setStatus({ kind: "idle" });
+    setAuthStatus({ kind: "idle" });
+    setToken("");
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (token.trim().length === 0) {
+    if (!isAuthorized || trimmedToken.length === 0) {
       setStatus({
         kind: "error",
-        message: "管理者トークンを入力してください。",
+        message: "先に管理者トークンを認証してください。",
       });
       return;
     }
@@ -127,7 +190,7 @@ export default function AdminAnnouncementsPage() {
         method,
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token.trim()}`,
+          Authorization: `Bearer ${trimmedToken}`,
         },
         body: JSON.stringify(payload),
       });
@@ -181,10 +244,10 @@ export default function AdminAnnouncementsPage() {
   }
 
   async function handleDelete(id: string) {
-    if (token.trim().length === 0) {
+    if (!isAuthorized || trimmedToken.length === 0) {
       setStatus({
         kind: "error",
-        message: "削除には管理者トークンが必要です。",
+        message: "削除には認証済みのトークンが必要です。",
       });
       return;
     }
@@ -200,7 +263,7 @@ export default function AdminAnnouncementsPage() {
       const res = await fetch(`/api/admin/announcements/${id}`, {
         method: "DELETE",
         headers: {
-          Authorization: `Bearer ${token.trim()}`,
+          Authorization: `Bearer ${trimmedToken}`,
         },
       });
 
@@ -232,28 +295,89 @@ export default function AdminAnnouncementsPage() {
   const submitLabel = isEditing ? "お知らせを更新" : "お知らせを投稿";
   const loadingLabel = isEditing ? "更新中..." : "投稿中...";
 
-  return (
-    <div className="bg-white text-slate-900">
-      <main className="mx-auto flex max-w-3xl flex-col gap-8 px-4 py-8 sm:py-10">
-        <div className="flex items-start justify-between">
+  if (!isAuthorized) {
+    return (
+      <div className="bg-white text-slate-900">
+        <main className="mx-auto flex max-w-md flex-col gap-6 px-4 py-12">
           <div className="flex flex-col gap-2">
             <h1 className="text-xl font-semibold text-slate-900 sm:text-2xl">
-              管理者コンソール
+              管理者コンソールにアクセス
             </h1>
             <p className="text-sm text-slate-600">
-              環境変数{" "}
+              `.env.local` または Vercel の環境変数で設定した{" "}
               <code className="rounded bg-slate-100 px-2 py-1 text-xs text-slate-700">
                 ADMIN_TOKEN
               </code>{" "}
-              を設定した管理者のみが投稿を追加・編集・削除できます。
+              を入力してください。
             </p>
           </div>
+
+          <form className="flex flex-col gap-4" onSubmit={handleAuthorize}>
+            <label className="flex flex-col gap-2 text-sm text-slate-700">
+              管理者トークン
+              <input
+                type="password"
+                className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
+                value={token}
+                onChange={(event) => setToken(event.target.value)}
+                placeholder="例: xxxxxxxx"
+              />
+            </label>
+
+            <button
+              type="submit"
+              className="inline-flex items-center justify-center rounded-md bg-sky-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sky-400"
+              disabled={authStatus.kind === "loading"}
+            >
+              {authStatus.kind === "loading"
+                ? "認証中..."
+                : "管理者コンソールを開く"}
+            </button>
+
+            {authStatus.kind === "error" && (
+              <p className="text-sm font-medium text-rose-500">
+                {authStatus.message}
+              </p>
+            )}
+          </form>
+
           <Link
             href="/"
             className="text-xs font-medium text-slate-400 transition hover:text-slate-600"
           >
             公開ページへ戻る
           </Link>
+        </main>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white text-slate-900">
+      <main className="mx-auto flex max-w-3xl flex-col gap-8 px-4 py-8 sm:py-10">
+        <div className="flex flex-col gap-2">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex flex-col gap-1">
+              <h1 className="text-xl font-semibold text-slate-900 sm:text-2xl">
+                管理者コンソール
+              </h1>
+              <p className="text-sm text-slate-600">
+                投稿の追加・編集・削除はすべて認証済みのトークンで行われます。
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="text-xs font-medium text-slate-400 underline-offset-4 transition hover:text-slate-600 hover:underline"
+            >
+              認証をやり直す
+            </button>
+          </div>
+          {authStatus.kind === "success" && (
+            <p className="text-xs font-medium text-emerald-600">
+              {authStatus.message}
+            </p>
+          )}
         </div>
 
         <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
@@ -270,7 +394,7 @@ export default function AdminAnnouncementsPage() {
               <input
                 type="password"
                 className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
-                placeholder="環境変数 ADMIN_TOKEN の値を入力"
+                placeholder="認証済みのトークンを必要に応じて更新"
                 value={token}
                 onChange={(event) => setToken(event.target.value)}
               />
