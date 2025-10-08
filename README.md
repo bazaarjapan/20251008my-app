@@ -23,6 +23,15 @@
    cd <your-repo>
    ```
 
+## GitHub Codespaces で編集する場合
+ブラウザだけで開発できるので、ローカル環境構築が難しい場合はこちらが便利です。
+
+1. 自分のリポジトリのトップページで **Code** ボタン→「Codespaces」タブ→**Create codespace on main** を選択します。
+2. ブラウザ上の VS Code が起動し、自動で依存関係がインストールされます（初回は少し時間がかかります）。
+3. ターミナルで `npm run dev` を実行するとプレビュー URL が発行され、掲示板を確認できます。
+4. `.env.local` は Codespaces 上で作成可能です。エクスプローラーで「New File」→ `.env.local` を作成し、`ADMIN_TOKEN=your-secret-token` を追加します。
+5. 変更ができたら Git タブからコミットし、`main` へ push するか Pull Request を作成してください。
+
 ## ローカル環境のセットアップ
 1. 依存関係をインストールします。
    ```bash
