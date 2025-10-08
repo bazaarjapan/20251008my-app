@@ -1,4 +1,5 @@
 import { getAnnouncements } from "@/lib/announcements";
+import Link from "next/link";
 
 const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
   dateStyle: "medium",
@@ -12,6 +13,15 @@ export default async function Home() {
   return (
     <div className="bg-white text-slate-900">
       <main className="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-6 sm:py-8">
+        <div className="flex justify-end">
+          <Link
+            href="/admin/announcements"
+            className="text-xs font-medium text-slate-400 transition hover:text-slate-600"
+            prefetch={false}
+          >
+            管理者ページ
+          </Link>
+        </div>
         {!latest ? (
           <section className="rounded-md border border-dashed border-slate-200 bg-slate-50 p-6 text-center text-sm text-slate-500">
             現在表示できるお知らせはありません。新しい投稿が追加されるとこちらに表示されます。

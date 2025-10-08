@@ -1,4 +1,5 @@
 import { getAnnouncements } from "@/lib/announcements";
+import Link from "next/link";
 
 const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
   dateStyle: "medium",
@@ -11,6 +12,15 @@ export default async function AnnouncementsArchivePage() {
   return (
     <div className="bg-white text-slate-900">
       <main className="mx-auto max-w-3xl px-4 py-6 sm:py-8">
+        <div className="flex justify-end">
+          <Link
+            href="/admin/announcements"
+            className="text-xs font-medium text-slate-400 transition hover:text-slate-600"
+            prefetch={false}
+          >
+            管理者ページ
+          </Link>
+        </div>
         <h1 className="text-lg font-semibold text-slate-800 sm:text-xl">
           お知らせ一覧
         </h1>
