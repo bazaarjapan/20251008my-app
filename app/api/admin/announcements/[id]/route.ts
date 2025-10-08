@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { updateAnnouncement, deleteAnnouncement } from "@/lib/announcements";
 import { requireAdmin } from "@/lib/admin-auth";
 
 export async function PATCH(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } },
 ) {
   const auth = requireAdmin(request);
@@ -111,7 +111,7 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } },
 ) {
   const auth = requireAdmin(request);
