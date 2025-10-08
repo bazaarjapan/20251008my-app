@@ -2,13 +2,10 @@ import { NextResponse } from "next/server";
 import { updateAnnouncement, deleteAnnouncement } from "@/lib/announcements";
 import { requireAdmin } from "@/lib/admin-auth";
 
-type Params = {
-  params: {
-    id: string;
-  };
-};
-
-export async function PATCH(request: Request, { params }: Params) {
+export async function PATCH(
+  request: Request,
+  { params }: { params: { id: string } },
+) {
   const auth = requireAdmin(request);
   if (!auth.authorized) {
     return auth.response;
@@ -113,7 +110,10 @@ export async function PATCH(request: Request, { params }: Params) {
   }
 }
 
-export async function DELETE(request: Request, { params }: Params) {
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } },
+) {
   const auth = requireAdmin(request);
   if (!auth.authorized) {
     return auth.response;
