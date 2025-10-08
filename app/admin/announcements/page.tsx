@@ -389,19 +389,6 @@ export default function AdminAnnouncementsPage() {
           <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
             <fieldset className="flex flex-col gap-2">
               <label className="text-sm font-medium text-slate-700">
-                管理者トークン
-              </label>
-              <input
-                type="password"
-                className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
-                placeholder="認証済みのトークンを必要に応じて更新"
-                value={token}
-                onChange={(event) => setToken(event.target.value)}
-              />
-            </fieldset>
-
-            <fieldset className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-slate-700">
                 タイトル
               </label>
               <input
